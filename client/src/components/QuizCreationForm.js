@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
 import 'antd/dist/antd.css';
+import { useState } from 'react';
 import { Form, Input, Button, Space } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Card } from 'antd';
 import { Typography } from 'antd';
+import axios from 'axios';
 
 const { Title } = Typography;
 
@@ -11,18 +11,21 @@ const { Title } = Typography;
 const QuizCreationForm = () => {
 
   const [title, setTitle] = useState('');
-  const [quiz, setQuiz] = useState({});
 
   const onFinish = values => {
-    setQuiz({
-      title,
+   const quiz = {
+        title,
+        fullMarks: 50,
+        passMarks: 20,
       ...values
-    })
+   }
+    console.log(`Posting ${JSON.stringify(quiz, null, 2)} `);
+
+    axios.post('http://localhost:8080/quizzes/', quiz)
+    .then(response => console.log(response.data.id))
+    .catch(err => console.log(err))
+
   };
-
-  useEffect(() => {
-
-  })
 
   const handleTitleChange = (event) =>{
       setTitle(event.target.value);
@@ -47,11 +50,10 @@ const QuizCreationForm = () => {
           <>
             {fields.map(({ key, name, ...restField }) => (
               <>
-               <Card style={{ width: 300 }}>
 
                 <Form.Item
                   {...restField}
-                  name={[name, 'question']}
+                  name={[name, 'title']}
                   rules={[{ required: true, message: 'Missing Question' }]}
                 >
                   <Input placeholder="Question" />
@@ -98,10 +100,18 @@ const QuizCreationForm = () => {
                 >
                   <Input placeholder="Right Option" />
                 </Form.Item>
+
+                <Form.Item
+                  {...restField}
+                  name={[name, 'weight']}
+                  rules={[{ required: true, message: 'Missing weight' }]}
+                >
+                  <Input placeholder="Weight" />
+                </Form.Item>
+
                 <MinusCircleOutlined onClick={() => remove(name)}/>
 
                 </Space>
-              </Card>
               </>
             
             ))}

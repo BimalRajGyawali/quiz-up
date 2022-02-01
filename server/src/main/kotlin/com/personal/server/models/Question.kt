@@ -26,5 +26,3 @@ class Question(
     @ManyToOne
     val quiz: Quiz
 )
-
-interface QuestionRepo : JpaRepository<Question, Int>

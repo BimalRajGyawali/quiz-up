@@ -1,7 +1,7 @@
 package com.personal.server.models
 
-import org.springframework.data.jpa.repository.JpaRepository
-import java.util.*
+import java.time.LocalDateTime
+import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Id
 
@@ -12,9 +12,14 @@ class Quiz(
 
     val title: String,
 
-    val fullMarks: Double,
+    val durationInMinute: Int,
 
-    val passMarks: Double
-)
+    val draft: Boolean,
 
-interface QuizRepo : JpaRepository<Quiz, UUID>
+    val maxAttempt: Int,
+
+    val publishAt: LocalDateTime? = null,
+
+    var totalQuestions: Int = 0,
+
+    )

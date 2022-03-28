@@ -1,7 +1,9 @@
 package com.personal.server.models
 
-import org.springframework.data.jpa.repository.JpaRepository
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
+import javax.persistence.ManyToOne
 
 @Entity
 class Question(
@@ -19,12 +21,10 @@ class Question(
 
     val option4: String,
 
-    val correctAnswer: String,
+    val correctOption: String,
 
     val weight: Double,
 
     @ManyToOne
     val quiz: Quiz
 )
-
-interface QuestionRepo : JpaRepository<Question, Int>

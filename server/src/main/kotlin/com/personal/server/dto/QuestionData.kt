@@ -4,6 +4,7 @@ import com.personal.server.models.Question
 import com.personal.server.models.Quiz
 
 data class QuestionData(
+    val id: Int?,
     val title: String,
     val option1: String,
     val option2: String,
@@ -28,6 +29,7 @@ fun buildQuestion(questionData: QuestionData, quiz: Quiz): Question{
 
 fun buildQuestionData(question: Question): QuestionData{
     return QuestionData(
+        id = question.id,
         title = question.title,
         option1 = question.option1,
         option2 = question.option2,

@@ -1,10 +1,13 @@
 package com.personal.server.service.impl
 
 import com.personal.server.dto.QuizData
+import com.personal.server.dto.QuizDistributionData
 import com.personal.server.dto.buildQuestion
 import com.personal.server.dto.buildQuestionData
 import com.personal.server.models.Quiz
+import com.personal.server.models.QuizDistribution
 import com.personal.server.repo.QuestionRepo
+import com.personal.server.repo.QuizDistributionRepo
 import com.personal.server.repo.QuizRepo
 import com.personal.server.service.QuizService
 import org.springframework.data.repository.findByIdOrNull
@@ -16,16 +19,17 @@ import javax.transaction.Transactional
 @Service
 class QuizServiceImpl(
     private val quizRepo: QuizRepo,
-    private val questionRepo: QuestionRepo
+    private val questionRepo: QuestionRepo,
+    private val quizDistributionRepo: QuizDistributionRepo
 ) : QuizService {
 
 
-    private fun createQuiz(quizData: QuizData, draft: Boolean): UUID{
+    private fun createQuiz(quizData: QuizData, draft: Boolean): UUID {
         var quiz = Quiz(
             title = quizData.title,
             durationInMinute = quizData.durationInMinute,
             draft = draft,
-            publishAt = if(draft) null else LocalDateTime.now(),
+            publishAt = if (draft) null else LocalDateTime.now(),
             maxAttempt = quizData.maxAttempt,
         )
 
@@ -60,26 +64,38 @@ class QuizServiceImpl(
                 title = quiz.title,
                 durationInMinute = quiz.durationInMinute,
                 maxAttempt = quiz.maxAttempt,
-                questions = questionRepo.getAllByQuizId(quiz.id).map {
-                   buildQuestionData(it)
-                },
+                questions = listOf(),
                 publishAt = quiz.publishAt
             )
         }
     }
 
-    override fun getPublishedQuizById(id: UUID): QuizData {
+    override fun getPublishedQuizById(id: UUID): QuizDistributionData {
         val quiz = quizRepo.findByIdOrNull(id) ?: throw RuntimeException("Not Found")
 
-        return QuizData(
-            id = quiz.id,
-            title = quiz.title,
-            durationInMinute = quiz.durationInMinute,
-            maxAttempt = quiz.maxAttempt,
-            questions = questionRepo.getAllByQuizId(quiz.id).map {
-               buildQuestionData(it)
-            },
-            publishAt = quiz.publishAt
+        val quizDistribution = quizDistributionRepo.findFirstByQuizIdOrderByAttemptNoDesc(id)
+            ?: QuizDistribution(quiz = quiz)
+
+        if (quizDistribution.attemptNo >= quiz.maxAttempt) {
+            throw RuntimeException("Maximum attempts finished")
+        }
+
+        quizDistribution.attemptNo += 1
+
+        quizDistributionRepo.save(quizDistribution)
+
+        return QuizDistributionData(
+            quizDistribution.id,
+            QuizData(
+                id = quiz.id,
+                title = quiz.title,
+                durationInMinute = quiz.durationInMinute,
+                maxAttempt = quiz.maxAttempt,
+                questions = questionRepo.getAllByQuizId(quiz.id).map {
+                    buildQuestionData(it)
+                },
+                publishAt = quiz.publishAt
+            )
         )
 
 

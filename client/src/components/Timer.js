@@ -3,15 +3,15 @@ import React, { useEffect, useState } from "react";
 const Timer = ({ limit , handleTimeOut}) => {
   const [minute, setMinute] = useState(limit-1);
   const [second, setSecond] = useState(60);
+  const [timeUp, setTimeUp] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
       let sec = second - 1;
       if(sec <= 0){
           const min = minute - 1;
-          if(min <= 0){
-            setMinute(0);
-            setSecond(0);  
+          if(min <= 0){ 
+            setTimeUp(true);
             handleTimeOut();
             clearInterval(interval);
             return ;
@@ -21,7 +21,7 @@ const Timer = ({ limit , handleTimeOut}) => {
           sec = 60;
       }
       setSecond(sec);
-    }, 1000);
+    }, 10);
 
     return () => {
       clearInterval(interval);
@@ -30,7 +30,8 @@ const Timer = ({ limit , handleTimeOut}) => {
 
   return (
     <h2>
-      {minute} min : {second} sec
+      {timeUp ? <p style={{color:"red"}}>Time's up</p> :  `${minute} min : ${second} sec` }
+     
     </h2>
   );
 };

@@ -22,4 +22,6 @@ class Quiz(
 
     var totalQuestions: Int = 0,
 
+    var fullMarks: Double = 0.0
+
     )

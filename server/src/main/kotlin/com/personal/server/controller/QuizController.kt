@@ -1,6 +1,6 @@
 package com.personal.server.controller
 
-import com.personal.server.dto.QuizData
+import com.personal.server.dto.QuizDTO
 import com.personal.server.service.QuizService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,16 +18,16 @@ class QuizController(
 ) {
 
     @PostMapping("/publish")
-    fun publishQuiz(@RequestBody quizData: QuizData) : ResponseEntity<*>{
+    fun publishQuiz(@RequestBody quizDTO: QuizDTO) : ResponseEntity<*>{
         return ResponseEntity.ok(
-            mapOf("id" to quizService.publishQuiz(quizData))
+            mapOf("id" to quizService.publishQuiz(quizDTO))
         )
     }
 
     @PostMapping("/draft")
-    fun draftQuiz(@RequestBody quizData: QuizData) : ResponseEntity<*>{
+    fun draftQuiz(@RequestBody quizDTO: QuizDTO) : ResponseEntity<*>{
         return ResponseEntity.ok(
-            mapOf("id" to quizService.draftQuiz(quizData))
+            mapOf("id" to quizService.draftQuiz(quizDTO))
         )
     }
 

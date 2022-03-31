@@ -1,12 +1,12 @@
 package com.personal.server.service
 
-import com.personal.server.dto.QuizData
-import com.personal.server.dto.QuizDistributionData
+import com.personal.server.dto.QuizDTO
+import com.personal.server.dto.QuizDistributionDTO
 import java.util.UUID
 
 interface QuizService {
-    fun publishQuiz(quizData: QuizData): UUID
-    fun draftQuiz(quizData: QuizData): UUID
-    fun getAllPublishedQuiz(): List<QuizData>
-    fun getPublishedQuizById(id: UUID): QuizDistributionData
+    fun publishQuiz(quizDTO: QuizDTO): UUID
+    fun draftQuiz(quizDTO: QuizDTO): UUID
+    fun getAllPublishedQuiz(): List<QuizDTO>
+    fun getPublishedQuizById(id: UUID): QuizDistributionDTO
 }

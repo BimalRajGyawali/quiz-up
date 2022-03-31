@@ -2,8 +2,8 @@ package com.personal.server.dto
 
 import java.util.UUID
 
-data class QuizDistributionData(
+data class QuizDistributionDTO(
     val distributionId: UUID,
-    val quizData: QuizData,
+    val quizDTO: QuizDTO,
 
-)
+    )

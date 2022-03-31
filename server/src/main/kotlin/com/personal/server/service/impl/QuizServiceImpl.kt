@@ -1,7 +1,7 @@
 package com.personal.server.service.impl
 
-import com.personal.server.dto.QuizData
-import com.personal.server.dto.QuizDistributionData
+import com.personal.server.dto.QuizDTO
+import com.personal.server.dto.QuizDistributionDTO
 import com.personal.server.dto.buildQuestion
 import com.personal.server.dto.buildQuestionData
 import com.personal.server.models.Quiz
@@ -24,18 +24,18 @@ class QuizServiceImpl(
 ) : QuizService {
 
 
-    private fun createQuiz(quizData: QuizData, draft: Boolean): UUID {
+    private fun createQuiz(quizDTO: QuizDTO, draft: Boolean): UUID {
         var quiz = Quiz(
-            title = quizData.title,
-            durationInMinute = quizData.durationInMinute,
+            title = quizDTO.title,
+            durationInMinute = quizDTO.durationInMinute,
             draft = draft,
             publishAt = if (draft) null else LocalDateTime.now(),
-            maxAttempt = quizData.maxAttempt,
+            maxAttempt = quizDTO.maxAttempt,
         )
 
         quiz = quizRepo.save(quiz)
 
-        val questions = quizData.questions.map {
+        val questions = quizDTO.questions.map {
             buildQuestion(it, quiz)
         }
 
@@ -43,34 +43,40 @@ class QuizServiceImpl(
 
         quiz.totalQuestions = questions.size
 
+        for(question in questions){
+            quiz.fullMarks += question.weight
+        }
+
         quizRepo.save(quiz)
 
         return quiz.id
     }
 
     @Transactional
-    override fun publishQuiz(quizData: QuizData): UUID {
-        return createQuiz(quizData, false)
+    override fun publishQuiz(quizDTO: QuizDTO): UUID {
+        return createQuiz(quizDTO, false)
     }
 
-    override fun draftQuiz(quizData: QuizData): UUID {
-        return createQuiz(quizData, true)
+    override fun draftQuiz(quizDTO: QuizDTO): UUID {
+        return createQuiz(quizDTO, true)
     }
 
-    override fun getAllPublishedQuiz(): List<QuizData> {
+    override fun getAllPublishedQuiz(): List<QuizDTO> {
         return quizRepo.findAllByDraft(false).map { quiz ->
-            QuizData(
+            QuizDTO(
                 id = quiz.id,
                 title = quiz.title,
                 durationInMinute = quiz.durationInMinute,
                 maxAttempt = quiz.maxAttempt,
                 questions = listOf(),
-                publishAt = quiz.publishAt
+                publishAt = quiz.publishAt.toString(),
+                totalQuestions = quiz.totalQuestions,
+                fullMarks = quiz.fullMarks
             )
         }
     }
 
-    override fun getPublishedQuizById(id: UUID): QuizDistributionData {
+    override fun getPublishedQuizById(id: UUID): QuizDistributionDTO {
         val quiz = quizRepo.findByIdOrNull(id) ?: throw RuntimeException("Not Found")
 
         val quizDistribution = quizDistributionRepo.findFirstByQuizIdOrderByAttemptNoDesc(id)
@@ -84,9 +90,9 @@ class QuizServiceImpl(
 
         quizDistributionRepo.save(quizDistribution)
 
-        return QuizDistributionData(
+        return QuizDistributionDTO(
             quizDistribution.id,
-            QuizData(
+            QuizDTO(
                 id = quiz.id,
                 title = quiz.title,
                 durationInMinute = quiz.durationInMinute,
@@ -94,7 +100,9 @@ class QuizServiceImpl(
                 questions = questionRepo.getAllByQuizId(quiz.id).map {
                     buildQuestionData(it)
                 },
-                publishAt = quiz.publishAt
+                publishAt = quiz.publishAt.toString(),
+                totalQuestions = quiz.totalQuestions,
+                fullMarks = quiz.fullMarks
             )
         )
 

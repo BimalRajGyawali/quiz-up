@@ -27,4 +27,8 @@ class Question(
 
     @ManyToOne
     val quiz: Quiz
-)
+) {
+    override fun toString(): String {
+        return "Question(id=$id, title='$title 'correctOption='$correctOption', weight=$weight"
+    }
+}

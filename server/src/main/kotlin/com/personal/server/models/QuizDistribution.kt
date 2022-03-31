@@ -18,8 +18,8 @@ class QuizDistribution(
 
     val startTime: LocalDateTime = LocalDateTime.now(),
 
-    val submittedTime: LocalDateTime? = null,
+    var submittedTime: LocalDateTime? = null,
 
-    val grade: Double = 0.0
+    var grade: Double = 0.0
 
 )

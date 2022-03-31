@@ -1,8 +1,9 @@
 package com.personal.server.service
 
-import com.personal.server.dto.QuizSubmissionData
+import com.personal.server.dto.QuizSubmissionDTO
+import com.personal.server.dto.SubmissionSummaryDTO
 
 interface QuizSubmissionService {
 
-    fun submitQuiz(quizSubmissionData: QuizSubmissionData)
+    fun submitQuiz(quizSubmissionDTO: QuizSubmissionDTO) : SubmissionSummaryDTO
 }

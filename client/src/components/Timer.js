@@ -21,7 +21,7 @@ const Timer = ({ limit , handleTimeOut}) => {
           sec = 60;
       }
       setSecond(sec);
-    }, 10);
+    }, 1000);
 
     return () => {
       clearInterval(interval);

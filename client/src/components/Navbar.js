@@ -22,7 +22,7 @@ class Navbar extends React.Component {
         
         <p style={hero}>
 
-          <Link style={{color: "black"}} to="/home" >Quiz Up</Link>
+          <Link style={{color: "black"}} to="/" >Quiz Up</Link>
 
           </p>
       <Menu onClick={this.handleClick} selectedKeys={[current]} mode="horizontal" style={nav}>

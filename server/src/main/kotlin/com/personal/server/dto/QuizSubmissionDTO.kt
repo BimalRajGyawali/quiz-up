@@ -4,5 +4,5 @@ import java.util.UUID
 
 data class QuizSubmissionDTO(
     val quizDistributionId : UUID,
-    val userAnswers : List<UserAnswerDTO>
+    val userAnswers : List<UserAnswerInputDTO>
 )

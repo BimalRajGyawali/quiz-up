@@ -1,6 +1,6 @@
 package com.personal.server.dto
 
-data class UserAnswerDTO(
+data class UserAnswerInputDTO(
     val questionId : Int,
     val optionChosen : String
 )

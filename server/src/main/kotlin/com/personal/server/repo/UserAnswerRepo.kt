@@ -6,4 +6,9 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface UserAnswerRepo : JpaRepository<UserAnswer, UUID>
+interface UserAnswerRepo : JpaRepository<UserAnswer, UUID>{
+
+    fun findAllByQuizDistributionId(quizDistributionId: UUID): List<UserAnswer>
+
+    fun findByQuizDistributionIdAndQuestionId(quizDistributionId: UUID, questionId: Int) : UserAnswer?
+}

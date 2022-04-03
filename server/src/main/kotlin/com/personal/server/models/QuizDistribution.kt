@@ -14,7 +14,7 @@ class QuizDistribution(
     @ManyToOne
     val quiz: Quiz,
 
-    var attemptNo: Int = 0,
+    var attemptNo: Int,
 
     val startTime: LocalDateTime = LocalDateTime.now(),
 

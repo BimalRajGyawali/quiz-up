@@ -4,6 +4,7 @@ import com.personal.server.dto.QuizDTO
 import com.personal.server.dto.QuizDistributionDTO
 import com.personal.server.dto.buildQuestion
 import com.personal.server.dto.buildQuestionData
+import com.personal.server.exceptions.AppException
 import com.personal.server.models.Quiz
 import com.personal.server.models.QuizDistribution
 import com.personal.server.repo.QuestionRepo
@@ -43,7 +44,7 @@ class QuizServiceImpl(
 
         quiz.totalQuestions = questions.size
 
-        for(question in questions){
+        for (question in questions) {
             quiz.fullMarks += question.weight
         }
 
@@ -77,21 +78,26 @@ class QuizServiceImpl(
     }
 
     override fun getPublishedQuizById(id: UUID): QuizDistributionDTO {
-        val quiz = quizRepo.findByIdOrNull(id) ?: throw RuntimeException("Not Found")
+        val quiz = quizRepo.findByIdOrNull(id) ?: throw AppException("Not Found")
 
-        val quizDistribution = quizDistributionRepo.findFirstByQuizIdOrderByAttemptNoDesc(id)
-            ?: QuizDistribution(quiz = quiz)
 
-        if (quizDistribution.attemptNo >= quiz.maxAttempt) {
-            throw RuntimeException("Maximum attempts finished")
-        }
+        val newQuizDistribution = quizDistributionRepo.findFirstByQuizIdOrderByAttemptNoDesc(id)?.let {
+            if (it.attemptNo >= quiz.maxAttempt) {
+                throw AppException("Maximum attempts finished")
+            }
+            QuizDistribution(
+                quiz = quiz,
+                attemptNo = it.attemptNo + 1
+            )
+        } ?: QuizDistribution(
+            quiz = quiz,
+            attemptNo = 1
+        )
 
-        quizDistribution.attemptNo += 1
-
-        quizDistributionRepo.save(quizDistribution)
+        quizDistributionRepo.save(newQuizDistribution)
 
         return QuizDistributionDTO(
-            quizDistribution.id,
+            newQuizDistribution.id,
             QuizDTO(
                 id = quiz.id,
                 title = quiz.title,

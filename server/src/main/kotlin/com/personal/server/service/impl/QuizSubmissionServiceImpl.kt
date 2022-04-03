@@ -1,7 +1,10 @@
 package com.personal.server.service.impl
 
 import com.personal.server.dto.QuizSubmissionDTO
+import com.personal.server.dto.SubmissionDetailDTO
 import com.personal.server.dto.SubmissionSummaryDTO
+import com.personal.server.dto.UserAnswerOutputDTO
+import com.personal.server.dto.buildQuestionData
 import com.personal.server.models.QuizDistribution
 import com.personal.server.models.UserAnswer
 import com.personal.server.repo.QuestionRepo
@@ -11,6 +14,7 @@ import com.personal.server.service.QuizSubmissionService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Service
 class QuizSubmissionServiceImpl(
@@ -19,7 +23,7 @@ class QuizSubmissionServiceImpl(
     private val questionRepo: QuestionRepo
 ) : QuizSubmissionService {
 
-    override fun submitQuiz(quizSubmissionDTO: QuizSubmissionDTO) : SubmissionSummaryDTO {
+    override fun submitQuiz(quizSubmissionDTO: QuizSubmissionDTO): SubmissionSummaryDTO {
         val quizDistribution = quizDistributionRepo.findByIdOrNull(quizSubmissionDTO.quizDistributionId)
             ?: throw RuntimeException("You cannot submit this")
 
@@ -72,4 +76,26 @@ class QuizSubmissionServiceImpl(
         quizDistribution.grade = grade
         quizDistributionRepo.save(quizDistribution)
     }
+
+
+    override fun getSubmissionDetail(quizDistributionId: UUID): SubmissionDetailDTO {
+        val quizDistribution = quizDistributionRepo.findByIdOrNull(quizDistributionId)
+            ?: throw RuntimeException("Not Found")
+
+        return SubmissionDetailDTO(
+            quizDistributionId = quizDistributionId,
+            quizTitle = quizDistribution.quiz.title,
+            fullMarks = quizDistribution.quiz.fullMarks,
+            grade = quizDistribution.grade,
+            answers = questionRepo.getAllByQuizId(quizDistribution.quiz.id)
+                .map {
+                    UserAnswerOutputDTO(
+                        questionData = buildQuestionData(it),
+                        optionChosen = userAnswerRepo.findByQuizDistributionIdAndQuestionId(quizDistributionId, it.id)?.optionChosen
+                    )
+                }
+        )
+
+    }
+
 }
